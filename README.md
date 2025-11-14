@@ -1,8 +1,14 @@
 # SocialPulse: Social Media Listening and Analysis Platform
 
+<div align="right">
+  <strong>Language / Dil:</strong> 
+  <a href="README.md">🇬🇧 English</a> | 
+  <a href="README_TR.md">🇹🇷 Türkçe</a>
+</div>
+
 A modern, real-time social media monitoring and sentiment analysis platform designed for brands and individuals to track online presence, analyze sentiment, and gain insights from social media conversations.
 
-[Features](#features) • [Installation](#installation) • [Usage](#usage) • [API Documentation](#api-documentation)
+**Quick Links:** [📸 Screenshots](#screenshots) • [Features](#features) • [Installation](#installation) • [Usage](#usage) • [API Documentation](#api-documentation)
 
 ---
 

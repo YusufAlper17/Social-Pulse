@@ -1,8 +1,14 @@
 # SocialPulse: Sosyal Medya Dinleme ve Analiz Platformu
 
+<div align="right">
+  <strong>Language / Dil:</strong> 
+  <a href="README_TR.md">🇹🇷 Türkçe</a> | 
+  <a href="README.md">🇬🇧 English</a>
+</div>
+
 Markaların ve bireylerin çevrimiçi varlıklarını takip etmek, duygu analizi yapmak ve sosyal medya konuşmalarından değerli içgörüler elde etmek için tasarlanmış modern, gerçek zamanlı bir sosyal medya izleme ve duygu analizi platformu.
 
-[Özellikler](#özellikler) • [Kurulum](#kurulum) • [Kullanım](#kullanım) • [API Dokümantasyonu](#api-dokümantasyonu)
+**Hızlı Bağlantılar:** [📸 Ekran Görüntüleri](#ekran-görüntüleri) • [Özellikler](#özellikler) • [Kurulum](#kurulum) • [Kullanım](#kullanım) • [API Dokümantasyonu](#api-dokümantasyonu)
 
 ---
 
