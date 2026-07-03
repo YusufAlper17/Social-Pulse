@@ -41,6 +41,8 @@ SocialPulse is a comprehensive social media listening and analysis platform that
 - Advanced filtering by source, sentiment, date range, and keywords
 - Interactive visual analytics with charts and graphs
 - Multi-account management with configurable keyword sets
+- Optional TweetClaw source review for X/Twitter searches, profiles, and
+  monitor exports before SocialPulse classifies sentiment and shows analytics
 
 ---
 
