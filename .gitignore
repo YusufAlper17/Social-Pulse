@@ -81,6 +81,9 @@ Thumbs.db
 *.temp
 .cache/
 
+# Vercel
+.vercel
+
 # Coverage reports
 htmlcov/
 .tox/

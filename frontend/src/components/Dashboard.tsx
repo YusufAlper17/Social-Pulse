@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { API_BASE_URL } from '../config';
 import {
   Box,
   Button,
@@ -250,8 +251,7 @@ const Dashboard: React.FC = () => {
       
       let response;
       try {
-        response = await fetch(`http://localhost:5004/api/posts?${queryParams.toString()}`);
-        console.log('Fetch attempt on port 5004');
+        response = await fetch(`${API_BASE_URL}/api/posts?${queryParams.toString()}`);
       } catch (error) {
         console.error('Error fetching posts:', error);
         return;

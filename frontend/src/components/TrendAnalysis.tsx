@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { API_BASE_URL } from '../config';
 import { Card, CardContent, Typography, Grid, Chip, IconButton, Menu, MenuItem, TextField } from '@mui/material';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
@@ -18,7 +19,7 @@ const TrendAnalysis: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
   useEffect(() => {
-    fetch('http://localhost:5001/api/trends')
+    fetch(`${API_BASE_URL}/api/trends`)
       .then(response => response.json())
       .then(data => setTrends(data));
   }, []);
