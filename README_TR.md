@@ -230,7 +230,22 @@ Uygulama şu adreslerde kullanılabilir olacaktır:
 - **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:5004
 
----
+#### Seçenek 3: Vercel'e Tek Uygulama Olarak Deploy (Production)
+
+Frontend ve backend aynı Vercel projesinde birlikte deploy edilir. React arayüzü `public/` altına build edilir, Flask API `/api/*` rotalarını sunar.
+
+Proje kök dizininden:
+```bash
+vercel --prod
+```
+
+Vercel proje ayarları:
+- **Root Directory**: repository kökü
+- **Build Command**: `pyproject.toml` içindeki script otomatik çalışır
+- **Environment Variables (isteğe bağlı)**: `NEWS_API_KEY` sunucu tarafı varsayılan anahtar için
+
+Production'da frontend, backend'e aynı domain üzerinden (`/api/...`) istek atar.
+
 
 ## Yapılandırma
 
@@ -273,7 +288,7 @@ Sunucu tarafında varsayılan bir anahtar tanımlamak isterseniz `backend/.env` 
 NEWS_API_KEY=your_news_api_key_here
 ```
 
-Vercel backend deploy'u için aynı değişkeni Vercel dashboard'da **Project Settings → Environment Variables** bölümüne ekleyin.
+Vercel deploy'u için aynı değişkeni Vercel dashboard'da **Project Settings → Environment Variables** bölümüne ekleyin. Alternatif olarak kullanıcılar arayüzden kendi anahtarlarını girebilir; bu durumda sunucu tarafı anahtarı zorunlu değildir.
 
 ---
 

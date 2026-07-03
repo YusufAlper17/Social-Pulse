@@ -230,6 +230,22 @@ The application will be available at:
 - **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:5004
 
+#### Option 3: Deploy to Vercel as a Single App (Production)
+
+Frontend and backend deploy together in one Vercel project. The React UI is built into `public/`, and the Flask API serves `/api/*` routes.
+
+From the repository root:
+```bash
+vercel --prod
+```
+
+Vercel project settings:
+- **Root Directory**: repository root
+- **Build Command**: runs automatically from `pyproject.toml`
+- **Environment Variables (optional)**: `NEWS_API_KEY` for a server-side default key
+
+In production, the frontend calls the backend on the same domain via `/api/...`.
+
 ---
 
 ## Configuration
@@ -273,7 +289,7 @@ If you want a server-side default key, add it to your `backend/.env` file:
 NEWS_API_KEY=your_news_api_key_here
 ```
 
-For the Vercel backend deployment, add the same variable in **Project Settings → Environment Variables**.
+For the Vercel deployment, add the same variable in **Project Settings → Environment Variables**. Alternatively, users can enter their own key in the UI, so a server-side key is optional.
 
 ---
 

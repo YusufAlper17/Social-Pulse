@@ -45,6 +45,7 @@ lerna-debug.log*
 
 # React / Frontend
 frontend/build/
+public/
 frontend/.pnp
 frontend/.pnp.js
 frontend/coverage/
@@ -95,9 +96,8 @@ coverage.xml
 # Jupyter Notebook
 .ipynb_checkpoints
 
-# pyenv
-.python-version
-!backend/.python-version
+# pyenv local overrides (root .python-version is committed for Vercel)
+backend/.python-version
 
 # Backup files
 *.bak
