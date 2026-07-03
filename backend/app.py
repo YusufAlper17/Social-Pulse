@@ -18,9 +18,21 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
+
+DEFAULT_CORS_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://frontend-iota-gold-57.vercel.app",
+    r"https://.*\.vercel\.app",
+]
+CORS_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv("CORS_ORIGINS", ",".join(DEFAULT_CORS_ORIGINS)).split(",")
+    if origin.strip()
+]
 CORS(app, resources={
     r"/*": {
-        "origins": ["http://localhost:3000"],
+        "origins": CORS_ORIGINS,
         "methods": ["GET", "POST", "PUT", "DELETE"],
         "allow_headers": ["Content-Type"]
     }
@@ -399,6 +411,18 @@ def get_sources():
             {'id': 'bloomberght', 'name': 'Bloomberg HT', 'logo': '/logos/bloomberght.png'},
             {'id': 'dunya', 'name': 'Dünya Gazetesi', 'logo': '/logos/dunya.png'},
             {'id': 'mynet', 'name': 'Mynet Finans', 'logo': '/logos/mynet.png'}
+        ]
+    })
+
+@app.route('/api/trends', methods=['GET'])
+def get_trends():
+    return jsonify({
+        'keywords': [
+            {'name': 'gündem', 'count': 128},
+            {'name': 'haber', 'count': 96},
+            {'name': 'teknoloji', 'count': 74},
+            {'name': 'ekonomi', 'count': 63},
+            {'name': 'sosyal medya', 'count': 51}
         ]
     })
 

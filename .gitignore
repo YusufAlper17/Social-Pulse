@@ -97,6 +97,7 @@ coverage.xml
 
 # pyenv
 .python-version
+!backend/.python-version
 
 # Backup files
 *.bak
