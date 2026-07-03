@@ -1,0 +1,7 @@
+{
+  "name": "social-pulse",
+  "private": true,
+  "scripts": {
+    "vercel-build": "bash scripts/vercel-build.sh"
+  }
+}

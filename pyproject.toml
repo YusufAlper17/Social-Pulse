@@ -1,5 +1,17 @@
-[tool.vercel]
-entrypoint = "backend.app:app"
+[project]
+name = "social-pulse"
+version = "1.0.0"
+requires-python = ">=3.12"
+dependencies = [
+  "flask==2.0.1",
+  "werkzeug==2.0.3",
+  "flask-cors==3.0.10",
+  "requests==2.31.0",
+  "python-dotenv==1.0.0",
+  "mysql-connector-python",
+  "nltk",
+  "textblob",
+]
 
 [tool.vercel.scripts]
 build = "bash scripts/vercel-build.sh"
