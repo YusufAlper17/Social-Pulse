@@ -40,8 +40,15 @@ import {
   Delete as DeleteIcon,
   Add as AddIcon,
   Close as CloseIcon,
+  Key as KeyIcon,
 } from '@mui/icons-material';
 import { AppContext } from '../App';
+import {
+  clearNewsApiKey,
+  getNewsApiKey,
+  hasNewsApiKey,
+  setNewsApiKey,
+} from '../utils/newsApiKey';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -88,6 +95,14 @@ const Settings: React.FC = () => {
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
   const [newKeyword, setNewKeyword] = useState('');
   const [keywordError, setKeywordError] = useState('');
+  const [newsApiKey, setNewsApiKeyInput] = useState('');
+  const [newsApiKeySaved, setNewsApiKeySaved] = useState(false);
+  const [newsApiKeyError, setNewsApiKeyError] = useState('');
+
+  useEffect(() => {
+    setNewsApiKeyInput(getNewsApiKey());
+    setNewsApiKeySaved(hasNewsApiKey());
+  }, []);
 
   useEffect(() => {
     const tab = searchParams.get('tab');
@@ -95,6 +110,30 @@ const Settings: React.FC = () => {
       setTabValue(1);
     }
   }, [searchParams]);
+
+  const handleSaveNewsApiKey = () => {
+    const trimmedKey = newsApiKey.trim();
+
+    if (!trimmedKey) {
+      setNewsApiKeyError(
+        language === 'tr'
+          ? 'Lütfen News API anahtarınızı girin.'
+          : 'Please enter your News API key.'
+      );
+      return;
+    }
+
+    setNewsApiKey(trimmedKey);
+    setNewsApiKeySaved(true);
+    setNewsApiKeyError('');
+  };
+
+  const handleClearNewsApiKey = () => {
+    clearNewsApiKey();
+    setNewsApiKeyInput('');
+    setNewsApiKeySaved(false);
+    setNewsApiKeyError('');
+  };
 
   const handleAddKeywordToNewAccount = () => {
     const trimmedKeyword = newKeyword.trim();
@@ -258,6 +297,73 @@ const Settings: React.FC = () => {
                     <MenuItem value="en">English</MenuItem>
                   </Select>
                 </FormControl>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          <Grid item xs={12}>
+            <Card>
+              <CardContent>
+                <Box className="flex items-center justify-between mb-4">
+                  <Typography variant="h6">
+                    {language === 'tr' ? 'News API Anahtarı' : 'News API Key'}
+                  </Typography>
+                  <Chip
+                    icon={<KeyIcon />}
+                    label={
+                      newsApiKeySaved
+                        ? (language === 'tr' ? 'Kayıtlı' : 'Saved')
+                        : (language === 'tr' ? 'Eksik' : 'Missing')
+                    }
+                    color={newsApiKeySaved ? 'success' : 'warning'}
+                    size="small"
+                  />
+                </Box>
+                <Typography variant="body2" color="text.secondary" className="mb-4">
+                  {language === 'tr'
+                    ? 'Haber verilerini çekmek için NewsAPI.org anahtarınızı buraya girin. Anahtar tarayıcınızda saklanır ve API isteklerinde kullanılır.'
+                    : 'Enter your NewsAPI.org key here to fetch news data. The key is stored in your browser and sent with API requests.'}
+                </Typography>
+                <TextField
+                  label={language === 'tr' ? 'News API Anahtarı' : 'News API Key'}
+                  type="password"
+                  fullWidth
+                  value={newsApiKey}
+                  onChange={(e) => {
+                    setNewsApiKeyInput(e.target.value);
+                    setNewsApiKeyError('');
+                  }}
+                  error={Boolean(newsApiKeyError)}
+                  helperText={
+                    newsApiKeyError ||
+                    (language === 'tr'
+                      ? 'Ücretsiz anahtar almak için newsapi.org adresini ziyaret edin.'
+                      : 'Visit newsapi.org to get a free API key.')
+                  }
+                  className="mb-4"
+                />
+                <Box className="flex flex-wrap gap-2">
+                  <Button variant="contained" onClick={handleSaveNewsApiKey}>
+                    {language === 'tr' ? 'Kaydet' : 'Save'}
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    onClick={handleClearNewsApiKey}
+                    disabled={!newsApiKeySaved && !newsApiKey}
+                  >
+                    {language === 'tr' ? 'Anahtarı Sil' : 'Remove Key'}
+                  </Button>
+                  <Button
+                    component="a"
+                    href="https://newsapi.org/register"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    variant="text"
+                  >
+                    {language === 'tr' ? 'Anahtar Al' : 'Get API Key'}
+                  </Button>
+                </Box>
               </CardContent>
             </Card>
           </Grid>

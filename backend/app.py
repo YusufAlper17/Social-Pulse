@@ -34,7 +34,7 @@ CORS(app, resources={
     r"/*": {
         "origins": CORS_ORIGINS,
         "methods": ["GET", "POST", "PUT", "DELETE"],
-        "allow_headers": ["Content-Type"]
+        "allow_headers": ["Content-Type", "X-News-Api-Key"]
     }
 })
 
@@ -52,9 +52,22 @@ CACHE_DURATION = 900  # 15 dakika
 last_api_call = 0
 api_call_interval = 2  # saniye
 
-def get_cache_key(keyword, domains_str=None):
+def get_cache_key(keyword, domains_str=None, api_key=None):
     """Önbellek için benzersiz anahtar oluştur"""
-    return f"{keyword}:{domains_str if domains_str else 'all'}"
+    key_suffix = api_key[-4:] if api_key else 'default'
+    return f"{keyword}:{domains_str if domains_str else 'all'}:{key_suffix}"
+
+def get_news_api_key_from_request(req):
+    """İstekten veya ortam değişkeninden News API anahtarını al"""
+    header_key = req.headers.get('X-News-Api-Key', '').strip()
+    if header_key and header_key not in INVALID_NEWS_API_KEYS:
+        return header_key
+
+    env_key = (NEWS_API_KEY or '').strip()
+    if env_key in INVALID_NEWS_API_KEYS:
+        return ''
+
+    return env_key
 
 def get_from_cache(cache_key):
     """Önbellekten veri al"""
@@ -91,6 +104,7 @@ ACCOUNT_KEYWORDS = []
 # API Anahtarı ve URL
 NEWS_API_KEY = os.getenv('NEWS_API_KEY', '')
 NEWS_API_URL = "https://newsapi.org/v2/everything"
+INVALID_NEWS_API_KEYS = {'', 'your_news_api_key_here'}
 
 # Kaynak ID'lerini domain'lerle eşleştirme
 SOURCE_DOMAINS = {
@@ -147,12 +161,15 @@ def analyze_sentiment(text):
     else:
         return 'neutral'
 
-def cached_news_api_ara(keyword, domains_str=None):
+def cached_news_api_ara(keyword, domains_str=None, api_key=None):
     """News API çağrılarını önbellekleyen fonksiyon"""
     global last_api_call
+
+    if not api_key:
+        return []
     
     # Önbellek anahtarını oluştur
-    cache_key = get_cache_key(keyword, domains_str)
+    cache_key = get_cache_key(keyword, domains_str, api_key)
     
     # Önbellekten kontrol et
     cached_data = get_from_cache(cache_key)
@@ -170,7 +187,7 @@ def cached_news_api_ara(keyword, domains_str=None):
             'q': keyword,
             'language': 'tr',
             'sortBy': 'publishedAt',
-            'apiKey': NEWS_API_KEY,
+            'apiKey': api_key,
             'pageSize': 100,
             'searchIn': 'title,description,content'
         }
@@ -255,8 +272,11 @@ def keyword_match_score(text, keywords):
         print(f"Keyword match score hesaplanırken hata: {str(e)}")
         return 0
 
-def news_api_ara(keyword, sources=None):
+def news_api_ara(keyword, sources=None, api_key=None):
     try:
+        if not api_key:
+            return []
+
         # Domainleri hazırla
         domains_str = None
         if sources:
@@ -271,7 +291,7 @@ def news_api_ara(keyword, sources=None):
                 print("[news_api_ara] Geçerli domain bulunamadı")
         
         # Önbellekten veya API'den haberleri al
-        articles = cached_news_api_ara(keyword, domains_str)
+        articles = cached_news_api_ara(keyword, domains_str, api_key)
         
         # Anahtar kelime eşleşmesine göre filtreleme ve sıralama
         filtered_articles = []
@@ -346,6 +366,12 @@ def news_api_ara(keyword, sources=None):
 @app.route('/api/posts', methods=['GET'])
 def get_posts():
     try:
+        api_key = get_news_api_key_from_request(request)
+        if not api_key:
+            return jsonify({
+                'error': 'News API anahtarı gerekli. Ayarlar > Genel bölümünden anahtarınızı girin.'
+            }), 400
+
         sources = request.args.getlist('sources[]')
         keywords = request.args.getlist('keywords[]')
         search_query = request.args.get('search')
@@ -373,7 +399,7 @@ def get_posts():
         # Haberleri al
         news = []
         for keyword in keywords:
-            keyword_news = news_api_ara(keyword, sources)
+            keyword_news = news_api_ara(keyword, sources, api_key)
             news.extend(keyword_news)
         
         # Tekrar eden haberleri kaldır
@@ -435,6 +461,12 @@ def search():
     - sources[]: Kaynak ID'leri (isteğe bağlı)
     """
     try:
+        api_key = get_news_api_key_from_request(request)
+        if not api_key:
+            return jsonify({
+                'error': 'News API anahtarı gerekli. Ayarlar > Genel bölümünden anahtarınızı girin.'
+            }), 400
+
         search_query = request.args.get('search')
         if not search_query:
             return jsonify({'error': 'Arama sorgusu gerekli'}), 400
@@ -443,7 +475,7 @@ def search():
         print(f"[search] Arama sorgusu: {search_query}, Kaynaklar: {sources}")
 
         # News API'den haberleri al
-        articles = news_api_ara(search_query, sources)
+        articles = news_api_ara(search_query, sources, api_key)
         
         if not articles:
             print("[search] Haber bulunamadı")

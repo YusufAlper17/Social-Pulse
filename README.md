@@ -253,12 +253,27 @@ Edit `frontend/src/App.tsx` to configure:
 
 ### News API Key Setup
 
+News data requires a News API key. You can configure it in two ways:
+
+#### Option 1: Enter from the UI (Recommended)
+
 1. Sign up for a free account at [NewsAPI.org](https://newsapi.org/)
 2. Obtain your API key from the dashboard
-3. Add it to `backend/app.py` or your `.env` file:
-   ```python
-   NEWS_API_KEY = "your_api_key_here"
-   ```
+3. In the app, go to **Settings → General → News API Key**
+4. Paste your key and click **Save**
+5. Return to the dashboard and click **Search**
+
+The key is stored in your browser and sent to the backend via the `X-News-Api-Key` header.
+
+#### Option 2: Backend Environment Variable
+
+If you want a server-side default key, add it to your `backend/.env` file:
+
+```bash
+NEWS_API_KEY=your_news_api_key_here
+```
+
+For the Vercel backend deployment, add the same variable in **Project Settings → Environment Variables**.
 
 ---
 
@@ -281,7 +296,11 @@ Edit `frontend/src/App.tsx` to configure:
    - Add keywords that you want to track
    - These keywords will be used for filtering and searching posts
 
-5. Search for Posts:
+5. Enter Your News API Key:
+   - Go to Settings → General → News API Key
+   - Save your NewsAPI.org key
+
+6. Search for Posts:
    - Click the "Ara" (Search) button to fetch posts from selected sources
    - Posts will appear in the main dashboard with sentiment analysis
 

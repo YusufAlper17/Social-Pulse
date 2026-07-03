@@ -1,5 +1,11 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 import { API_BASE_URL } from '../config';
+import {
+  buildApiHeaders,
+  hasNewsApiKey,
+  NEWS_API_KEY_UPDATED_EVENT,
+} from '../utils/newsApiKey';
 import {
   Box,
   Button,
@@ -15,7 +21,8 @@ import {
   Menu,
   MenuItem,
   Checkbox,
-  CircularProgress
+  CircularProgress,
+  Alert,
 } from '@mui/material';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import PersonIcon from '@mui/icons-material/Person';
@@ -209,7 +216,19 @@ const Dashboard: React.FC = () => {
   const [lastFetchTime, setLastFetchTime] = useState<number>(0);
   const FETCH_COOLDOWN = 2000; // 2 saniye bekleme süresi
   const [isSearching, setIsSearching] = useState(false);
+  const [apiKeyMissing, setApiKeyMissing] = useState(!hasNewsApiKey());
+  const [fetchError, setFetchError] = useState('');
   const { activeAccount } = useContext(AppContext);
+
+  useEffect(() => {
+    const handleApiKeyUpdate = () => {
+      setApiKeyMissing(!hasNewsApiKey());
+      setFetchError('');
+    };
+
+    window.addEventListener(NEWS_API_KEY_UPDATED_EVENT, handleApiKeyUpdate);
+    return () => window.removeEventListener(NEWS_API_KEY_UPDATED_EVENT, handleApiKeyUpdate);
+  }, []);
 
   const fetchPosts = React.useCallback(async () => {
     console.log('Fetch Posts Called with:', {
@@ -222,9 +241,19 @@ const Dashboard: React.FC = () => {
     if (selectedSources.length === 0) {
       console.warn('No sources selected, skipping fetch');
       setPosts([]);
+      setFetchError('');
       return;
     }
 
+    if (!hasNewsApiKey()) {
+      setApiKeyMissing(true);
+      setPosts([]);
+      setFetchError('News API anahtarı gerekli. Ayarlar > Genel bölümünden anahtarınızı girin.');
+      return;
+    }
+
+    setApiKeyMissing(false);
+    setFetchError('');
     setLoading(true);
     try {
       const currentTime = Date.now();
@@ -251,27 +280,36 @@ const Dashboard: React.FC = () => {
       
       let response;
       try {
-        response = await fetch(`${API_BASE_URL}/api/posts?${queryParams.toString()}`);
+        response = await fetch(`${API_BASE_URL}/api/posts?${queryParams.toString()}`, {
+          headers: buildApiHeaders(),
+        });
       } catch (error) {
         console.error('Error fetching posts:', error);
+        setFetchError('Haberler alınırken bir bağlantı hatası oluştu.');
         return;
       }
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
       const data = await response.json();
       console.log('Received posts:', data);
+
+      if (!response.ok) {
+        const errorMessage = data.error || `HTTP error! status: ${response.status}`;
+        setFetchError(errorMessage);
+        setPosts([]);
+        return;
+      }
       
       if (data.error) {
         console.error('API error:', data.error);
+        setFetchError(data.error);
         setPosts([]);
       } else {
+        setFetchError('');
         setPosts(data);
       }
     } catch (error) {
       console.error('Error fetching posts:', error);
+      setFetchError('Haberler alınırken beklenmeyen bir hata oluştu.');
       setPosts([]);
     } finally {
       setLoading(false);
@@ -394,6 +432,22 @@ const Dashboard: React.FC = () => {
           </Button>
         </Box>
       </Box>
+
+      {(apiKeyMissing || fetchError) && (
+        <Alert
+          severity={apiKeyMissing ? 'warning' : 'error'}
+          sx={{ mb: 3 }}
+          action={
+            apiKeyMissing ? (
+              <Button color="inherit" size="small" component={RouterLink} to="/settings">
+                Ayarlara Git
+              </Button>
+            ) : undefined
+          }
+        >
+          {fetchError || 'News API anahtarı gerekli. Ayarlar > Genel bölümünden anahtarınızı girin.'}
+        </Alert>
+      )}
 
       {selectedSources.length === 0 && (
         <Box 

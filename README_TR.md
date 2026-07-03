@@ -253,12 +253,27 @@ Yapılandırmak için `frontend/src/App.tsx` dosyasını düzenleyin:
 
 ### News API Anahtarı Kurulumu
 
+Haber verilerinin çalışması için bir News API anahtarı gerekir. Anahtarı iki şekilde tanımlayabilirsiniz:
+
+#### Seçenek 1: Arayüzden Girme (Önerilen)
+
 1. [NewsAPI.org](https://newsapi.org/) adresinde ücretsiz bir hesap oluşturun
 2. Kontrol panelinden API anahtarınızı alın
-3. Bunu `backend/app.py` veya `.env` dosyanıza ekleyin:
-   ```python
-   NEWS_API_KEY = "your_api_key_here"
-   ```
+3. Uygulamada **Ayarlar → Genel → News API Anahtarı** bölümüne gidin
+4. Anahtarınızı yapıştırıp **Kaydet**'e tıklayın
+5. Kontrol paneline dönüp **Ara** butonuna basın
+
+Anahtar tarayıcınızda saklanır ve backend'e `X-News-Api-Key` header'ı ile gönderilir.
+
+#### Seçenek 2: Backend Ortam Değişkeni
+
+Sunucu tarafında varsayılan bir anahtar tanımlamak isterseniz `backend/.env` dosyanıza ekleyin:
+
+```bash
+NEWS_API_KEY=your_news_api_key_here
+```
+
+Vercel backend deploy'u için aynı değişkeni Vercel dashboard'da **Project Settings → Environment Variables** bölümüne ekleyin.
 
 ---
 
@@ -281,7 +296,11 @@ Yapılandırmak için `frontend/src/App.tsx` dosyasını düzenleyin:
    - İzlemek istediğiniz anahtar kelimeleri ekleyin
    - Bu anahtar kelimeler gönderileri filtrelemek ve aramak için kullanılacaktır
 
-5. Gönderileri Arayın:
+5. News API Anahtarını Girin:
+   - Ayarlar → Genel → News API Anahtarı bölümüne gidin
+   - NewsAPI.org anahtarınızı kaydedin
+
+6. Gönderileri Arayın:
    - Seçilen kaynaklardan gönderileri çekmek için "Ara" düğmesine tıklayın
    - Gönderiler duygu analizi ile ana kontrol panelinde görünecektir
 
